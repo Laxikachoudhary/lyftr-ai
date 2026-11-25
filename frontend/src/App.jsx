@@ -2,7 +2,10 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 
-const API = "http://127.0.0.1:8000";
+// Local backend for development; Render backend for deployment
+const API = (
+  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000"
+).replace(/\/$/, "");
 
 function App() {
   const [sessions, setSessions] = useState([]);
@@ -24,6 +27,7 @@ function App() {
 
       const data = await res.json();
       const savedSessions = data.sessions || [];
+
       setSessions(savedSessions);
 
       const savedId = localStorage.getItem("lyftr_session_id");
@@ -81,6 +85,7 @@ function App() {
 
       setMessages([]);
       setSessionId(data.session_id);
+
       setSessions(prev => [
         {
           session_id: data.session_id,
@@ -145,6 +150,7 @@ function App() {
 
       // Refresh conversation list after sending
       const historyRes = await fetch(`${API}/sessions`);
+
       if (historyRes.ok) {
         const historyData = await historyRes.json();
         setSessions(historyData.sessions || []);
@@ -167,6 +173,7 @@ function App() {
       <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
           <h2>✦ Lyftr AI</h2>
+
           <button
             className="icon-button"
             onClick={() => setSidebarOpen(false)}
@@ -193,6 +200,7 @@ function App() {
               disabled={loading}
             >
               <span className="session-icon">◷</span>
+
               <span className="session-title">
                 {session.title || "New Chat"}
               </span>
@@ -216,6 +224,7 @@ function App() {
               ☰
             </button>
           )}
+
           <span>AI Assistant</span>
           <span className="status">● Online</span>
         </header>
@@ -235,6 +244,7 @@ function App() {
                 <strong>
                   {msg.role === "user" ? "You" : "✦ Lyftr AI"}
                 </strong>
+
                 <p>{msg.content}</p>
 
                 {msg.metadata && (
@@ -248,7 +258,9 @@ function App() {
             ))}
 
             {loading && (
-              <div className="loading">Lyftr AI is thinking...</div>
+              <div className="loading">
+                Lyftr AI is thinking...
+              </div>
             )}
           </div>
 
@@ -259,6 +271,7 @@ function App() {
               placeholder="Message Lyftr AI..."
               disabled={loading || !sessionId}
             />
+
             <button
               type="submit"
               disabled={loading || !input.trim() || !sessionId}
